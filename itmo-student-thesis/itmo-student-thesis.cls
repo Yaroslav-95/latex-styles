@@ -32,8 +32,8 @@
     \setmainfont[Ligatures={TeX,Historic}]{Times New Roman}
     \setsansfont{Arial}
     \setmonofont{Courier New}
-\else
-    \RequirePackage{paratype}
+%% \else
+    %% \RequirePackage{paratype}
 \fi
 
 %% Конфигурируем babel
@@ -122,6 +122,7 @@
 \newcommand*{\@tablecontinuation}[1]{Table~#1, continued}
 \newcommand*{\@chaptername}{CHAPTER}
 \newcommand*{\@introductionname}{INTRODUCTION}
+\newcommand*{\@abbreviationsname}{LIST OF ABBREVIATIONS}
 \newcommand*{\@conclusionname}{CONCLUSION}
 \newcommand*{\@appendixname}{APPENDIX}
 \newcommand*{\@appendixcounter}{\Alph{chapter}}
@@ -151,6 +152,7 @@
 \renewcommand*{\@tablecontinuation}[1]{Table~#1, continued}%
 \renewcommand*{\@chaptername}{CHAPTER}%
 \renewcommand*{\@introductionname}{INTRODUCTION}%
+\renewcommand*{\@abbreviationsname}{LIST OF ABBREVIATIONS}%
 \renewcommand*{\@conclusionname}{CONCLUSION}%
 \renewcommand*{\@appendixname}{APPENDIX}%
 \renewcommand*{\@appendixcounter}{\Alph{chapter}}%
@@ -178,13 +180,14 @@
 \renewcommand*{\labelenumi}{\asbukx{enumi})}%
 \renewcommand*{\theenumi}{\asbukx{enumi}}%
 \renewcommand*{\@tablecontinuation}[1]{Продолжение таблицы~#1}%
-\renewcommand*{\@chaptername}{ГЛАВА}%
-\renewcommand*{\@introductionname}{ВВЕДЕНИЕ}%
-\renewcommand*{\@conclusionname}{ЗАКЛЮЧЕНИЕ}%
-\renewcommand*{\@appendixname}{ПРИЛОЖЕНИЕ}%
+\renewcommand*{\@chaptername}{}%
+\renewcommand*{\@introductionname}{Введение}%
+\renewcommand*{\@abbreviationsname}{Перечень сокращений}%
+\renewcommand*{\@conclusionname}{Заключение}%
+\renewcommand*{\@appendixname}{Приложение}%
 \renewcommand*{\@appendixcounter}{\Asbukx{chapter}}%
 \renewcommand*{\@proofname}{Доказательство}%
-\renewcommand*{\@referencesname}{СПИСОК ИСПОЛЬЗОВАННЫХ ИСТОЧНИКОВ}%
+\renewcommand*{\@referencesname}{Список литературы}%
 \renewcommand*{\@chapterconclusion}{Выводы по главе}%
 \renewcommand*{\@listingname}{Листинг}%
 \renewcommand*{\@theorem@theorem}{Теорема}%
@@ -212,7 +215,7 @@
 \\\hline #4 \\\hline \endfirsthead
 \multicolumn{#5}{r}{\normalsize\@tablecontinuation{\thetable}} \\\hline #4 \endhead
 }{\end{longtable}}
-                    
+
 %% Библиография по ГОСТу. Используем только бибер.
 
 \RequirePackage[
@@ -373,7 +376,7 @@
   \counterwithout{lstlisting}{section}
   \counterwithout{lstlisting}{subsection}
 }
-     
+
 
 %% "Тонкая" настройка теховских штрафов при формировании абзацев.
 
@@ -460,7 +463,9 @@
 \@countsourceswhere{check=bibch@foreignsourcesveryold}{c@foreignsourcesveryold}%
 \@countsourceswhere{type=online}{c@internetsources}}
 
-\newcommand{\printannobibliography}{\renewcommand*{\bibfont}{\small}\printbibliography[heading=none]}
+\newcommand{\@killhyperrefissue}{\renewbibmacro{pageref}{}\let\blx@anchor\relax}
+
+\newcommand{\printannobibliography}{\begingroup\@killhyperrefissue\renewcommand*{\bibfont}{\small}\printbibliography[heading=none]\endgroup}
 
 %% Подсчет источников различных категорий. Это следующие команды:
 %%   \relatedworksourcecount   - число источников, использованных в обзоре
@@ -494,7 +499,7 @@
 %%% Считаем в счетчик #2 число ссылок, удовлетворяющих фильтру #1
 \newcommand{\@countsourceswhere}[2]{%
 \setcounter{@bibliocounter}{0}%
-\printbibliography[env=@fillbibliocounter,heading=reallynone,#1]%
+\begingroup\@killhyperrefissue\printbibliography[env=@fillbibliocounter,heading=reallynone,#1]\endgroup%
 \setcounter{#2}{\arabic{@bibliocounter}}}
 
 %%% Определяем команды через значения счетчиков
@@ -527,17 +532,18 @@
 
 \RequirePackage{titlesec}
 \RequirePackage{titletoc}
+\RequirePackage[hidelinks]{hyperref}
 
 \setcounter{secnumdepth}{3}
-\titleformat{\chapter}[block]{\normalsize\bfseries\center}{\@chaptername~\thechapter.~}%
+\titleformat{\chapter}[block]{\large\bfseries\center}{\@chaptername~\thechapter.~}%
 {0pt}{\begin{MakeUppercase}}[\end{MakeUppercase}\thispagestyle{\TheOnlyTruePageStyle}]
-\titlespacing{\chapter}{0pt}{-30pt}{0pt}
+\titlespacing{\chapter}{0pt}{-30pt}{28pt}
 \titleformat{\section}[block]{\normalsize\bfseries\center}{\thesection.~}{0pt}{}
-\titlespacing{\section}{0pt}{0pt}{0pt}
+\titlespacing{\section}{0pt}{28pt}{28pt}
 \titleformat{\subsection}[block]{\normalsize\bfseries\center}{\thesubsection.~}{0pt}{}
-\titlespacing{\subsection}{0pt}{0pt}{0pt}
+\titlespacing{\subsection}{0pt}{28pt}{28pt}
 \titleformat{\subsubsection}[block]{\normalsize\bfseries\center}{\thesubsubsection.~}{0pt}{}
-\titlespacing{\subsubsection}{0pt}{0pt}{0pt}
+\titlespacing{\subsubsection}{0pt}{28pt}{28pt}
 
 %% \appendix начинает приложения, которые должны правильно именоваться.
 
@@ -616,11 +622,14 @@
 \newcommand{\startappendices}{\appendix}
 \newcommand{\initializefrontsections}{}
 
-%% ...отдельным пунктом - введение и заключение
+%% ...отдельным пунктом - введение, список сокращений и заключение
 
 \newcommand{\startprefacepage}{%
 \chapter*{\@introductionname}\label{chapter:introduction}%
 \addcontentsline{toc}{chapter}{\@introductionname}}
+\newcommand{\startabbreviationspage}{%
+\chapter*{\@abbreviationsname}\label{chapter:abbreviations}%
+\addcontentsline{toc}{chapter}{\@abbreviationsname}}
 \newcommand{\startconclusionpage}{%
 \chapter*{\@conclusionname}\label{chapter:conclusion}%
 \addcontentsline{toc}{chapter}{\@conclusionname}}
@@ -1045,9 +1054,9 @@
     \banhyphens
     \begin{center}\theuniversity\end{center}
     \vspace{0cm plus 0.66fill minus 0cm}
-    {\centering\bfseries\MakeUppercase{\@strings@ThesisName}\par}
+    {\centering\large\bfseries\MakeUppercase{\@strings@ThesisName}\par}
     \vspace{0cm plus 0.66fill minus 0cm}
-    {\centering\MakeUppercase{\thetitle}\par}
+    {\centering\Large\bfseries\MakeUppercase{\thetitle}\par}
     \vspace{0cm plus 1fill minus 0cm}
     {\setlength{\tabcolsep}{3pt}\renewcommand{\arraystretch}{1.5}
     \noindent\begin{tabularx}{\textwidth}{Xl}
